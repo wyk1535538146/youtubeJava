@@ -20,8 +20,12 @@ import java.util.HashMap;
 @Controller
 public class Oauth {
 
-    private static final String client_id = "508785976421-cr17tf61kj47jdaefigaas2vsnqi9emd.apps.googleusercontent.com";
-    private static final String client_secret = "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";
+    private static final String client_id = "656863191434-f0ab0j31jrjtas919i2jrt1ejj1bcgum.apps.googleusercontent.com";
+    private static final String client_secret = "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";
+
+    //workspace 这个号
+    /*private static final String client_id = "508785976421-cr17tf61kj47jdaefigaas2vsnqi9emd.apps.googleusercontent.com";
+    private static final String client_secret = "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";*/
     public static String tokenString = "";
 
     @RequestMapping("getCode")
@@ -83,6 +87,7 @@ public class Oauth {
                 .form(param)//表单内容
                 .execute().body();
         System.out.println(result2);
+        tokenString = "";
 
         return "redirect:http://localhost:3000/";
     }

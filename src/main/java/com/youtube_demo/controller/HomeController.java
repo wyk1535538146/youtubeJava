@@ -2,7 +2,10 @@ package com.youtube_demo.controller;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson.JSONObject;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.youtube_demo.entity.Video;
 import com.youtube_demo.oauth.Oauth;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +24,7 @@ import java.util.HashMap;
  */
 @RestController
 public class HomeController {
+    //workspace 号
 //    private static final String key = "AIzaSyDkAu2Vi-My8rxmvfVvXkt9Zuj7zuqAq2E";
     private static final String key = "AIzaSyADflK5MEC9uB8bvgLIQU01yuv6ur4Bn2c";
 
@@ -98,7 +102,6 @@ public class HomeController {
         String videoId = request.getParameter("videoId");
         String snippetString = "{'snippet':{'videoId':'" + videoId + "','topLevelComment':{'snippet':{'textOriginal':'" + textOriginal + "'}}}}";
         String url = baseUrl + "/commentThreads?part=snippet&key=" + key;
-        HttpSession session = request.getSession();
         String token = Oauth.tokenString;
 
         String res = HttpRequest.post(url)
@@ -127,12 +130,14 @@ public class HomeController {
         param.put("key", key);
         param.put("part", "brandingSettings");
 
-        String url = baseUrl + "/comments";
+        String url = baseUrl + "/comments?part=snippet&key="+key;
 
         setProp();
-
+        System.out.println(body);
+        String token = Oauth.tokenString;
         String res = HttpRequest.post(url)
-                .form(param)//表单内容
+                .auth("Bearer " + token)
+//                .form(param)//表单内容
                 .body(body)
                 .execute().body();
         System.out.println(res);
@@ -164,7 +169,34 @@ public class HomeController {
         return res;
     }
 
-    // todo 未测试
+    //todo
+    /**
+     * @description: 获得你对该视频的rate(评价)
+     * @author: wyk
+     * @date: 2022/8/4 10:13
+     * @param: [request]
+     * @return: java.lang.String
+     **/
+    @RequestMapping("getRating")
+    public String getRating(HttpServletRequest request){
+        String id = request.getParameter("videoId");
+        HashMap<String, Object> param = new HashMap<>();
+        param.put("key", key);
+        param.put("id", id);
+
+        String token = Oauth.tokenString;
+
+        String url = baseUrl + "/videos/getRating?id=" + id + "&key=" + key;
+
+        String res = HttpRequest.post(url)
+                .setHttpProxy("127.0.0.1", 4780)
+                .auth("Bearer " + token)
+                .header("Accept", "application/json")
+                .execute().body();
+        System.out.println(token + "\n" + url);
+        return res;
+    }
+
     /**
      * @description: 对视频的三个评分， 喜欢，不喜欢，不设置
      * @author: wyk
@@ -181,16 +213,34 @@ public class HomeController {
         param.put("id", id);
         param.put("rating", rating);
 
-        String url = baseUrl + "/videos/rate";
+        String token = Oauth.tokenString;
 
-        String res = HttpUtil.post(url, param);
+        String url = baseUrl + "/videos/rate";
+        setProp();
+        String res = HttpRequest.post(url)
+                .auth("Bearer " + token)
+                .form(param)
+                .execute().body();
+
 
         return res;
     }
 
 
 
-    //todo 未测试，不知道为什么title改不了
+    @RequestMapping("getChannelId")
+    public String getChannelId(){
+        String url = baseUrl + "/channels?part=snippet,contentDetails,statistics&mine=true&key=" + key;
+        String token = Oauth.tokenString;
+        String res = HttpRequest.get(url)
+                .setHttpProxy("127.0.0.1", 4780)
+                .auth("Bearer " + token)
+                .execute().body();
+        System.out.println(res);
+        return res;
+    }
+
+
     /**
      * @description: 修改个人频道信息
      * @author: wyk
@@ -207,15 +257,43 @@ public class HomeController {
         param.put("part", "brandingSettings");
 
         String body = "{'id':'" + id + "','brandingSettings':{'channel': {'description': '" + description + "', 'defaultLanguage': 'en'}}}";
-        String url = baseUrl + "/channels";
+        String url = baseUrl + "/channels?part=brandingSettings&key="+key;
 
-        setProp();
+        System.out.println(body);
+        String token = Oauth.tokenString;
 
-        String res = HttpRequest.post(url)
-                .form(param)//表单内容
+        String res = HttpRequest.put(url)
+                .setHttpProxy("127.0.0.1", 4780)
+                .auth("Bearer " + token)
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+//                .form(param)//表单内容
                 .body(body)
                 .execute().body();
         System.out.println(res);
+        return res;
+    }
+
+
+    @RequestMapping("LiveChatMessages_insert")
+    public String LiveChatMessages_insert(HttpServletRequest request){
+        String id = request.getParameter("videoId");
+        String messageText = request.getParameter("messageText");
+
+        String token = Oauth.tokenString;
+        String url = baseUrl + "/videos?part=liveStreamingDetails&id=" + id + "&key=" + key;
+
+        setProp();
+        String res = HttpRequest.get(url)
+                .auth("Bearer " + token)
+                .execute().body();
+
+        JSONObject jsonObject = JSONUtil.parseObj(res);
+        JSONArray jsonArray = JSONUtil.parseArray(jsonObject.get("items"));
+        System.out.println(jsonObject);
+        Video video = JSONUtil.toBean(JSONUtil.toJsonStr(jsonArray.get(1)), Video.class);
+        System.out.println(video.getSnippet());
+
         return res;
     }
 
@@ -233,4 +311,8 @@ public class HomeController {
 
 
     //todo 目前google获取到的数据全部没有改过结构，直接传到前端，到时候需要改一下，前端方便操作
+
+
+
+    //todo 1.频道名字和简介 2.关键词搜索字数限制 3.直播间发消息
 }
