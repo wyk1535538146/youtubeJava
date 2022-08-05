@@ -2,17 +2,13 @@ package com.youtube_demo.controller;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.youtube_demo.entity.Video;
-import com.youtube_demo.oauth.Oauth;
-import org.springframework.stereotype.Controller;
+import com.youtube_demo.util.oauth.Oauth;
+import com.youtube_demo.service.LiveChatService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
 
@@ -27,38 +23,12 @@ public class HomeController {
     //workspace 号
 //    private static final String key = "AIzaSyDkAu2Vi-My8rxmvfVvXkt9Zuj7zuqAq2E";
     private static final String key = "AIzaSyADflK5MEC9uB8bvgLIQU01yuv6ur4Bn2c";
-
     private static final String baseUrl = "https://www.googleapis.com/youtube/v3";
-
-    /**
-     * @description: 根据键入的查找内容查找对应的youtube信息，并返回
-     * @author: wyk
-     * @date: 2022/8/1 17:50
-     * @param: [request]
-     * @return: Json
-     **/
-    @RequestMapping("search")
-    public String search(HttpServletRequest request){
-        String inputText = request.getParameter("inputText");
-
-        // TODO 这部分参数感觉可以优化
-        HashMap<String, Object> param = new HashMap<>();
-        param.put("key", key);
-        param.put("type", "video");
-        param.put("part", "snippet");
-        param.put("q", inputText);
-        param.put("maxResults", 50);
-
-        String url = baseUrl + "/search";
-        //System.out.println(url);
+//private static final String baseUrl = "http://192.168.2.140";
+    @Autowired
+    LiveChatService liveChatService;
 
 
-        setProp();
-
-        String res = HttpUtil.get(url,param);
-
-        return res;
-    }
 
     /**
      * @description:
@@ -73,7 +43,7 @@ public class HomeController {
 
         HashMap<String, Object> param = new HashMap<>();
         param.put("key", key);
-        param.put("part", "snippet,replies");
+        param.put("part", "snippet");
         param.put("videoId", videoId);
         param.put("maxResults", 50);
         param.put("order","relevance");
@@ -124,7 +94,9 @@ public class HomeController {
     public String comments_insert(HttpServletRequest request){
         String textOriginal = request.getParameter("commentText");
         String parentId = request.getParameter("parentId");   //顶级评论的id
+        //todo json格式
         String body = "{'snippet':{'parentId':'" + parentId + "','textOriginal':'" + textOriginal + "'}}";
+
 
         HashMap<String, Object> param = new HashMap<>();
         param.put("key", key);
@@ -262,38 +234,15 @@ public class HomeController {
         System.out.println(body);
         String token = Oauth.tokenString;
 
+
         String res = HttpRequest.put(url)
                 .setHttpProxy("127.0.0.1", 4780)
                 .auth("Bearer " + token)
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
-//                .form(param)//表单内容
                 .body(body)
                 .execute().body();
         System.out.println(res);
-        return res;
-    }
-
-
-    @RequestMapping("LiveChatMessages_insert")
-    public String LiveChatMessages_insert(HttpServletRequest request){
-        String id = request.getParameter("videoId");
-        String messageText = request.getParameter("messageText");
-
-        String token = Oauth.tokenString;
-        String url = baseUrl + "/videos?part=liveStreamingDetails&id=" + id + "&key=" + key;
-
-        setProp();
-        String res = HttpRequest.get(url)
-                .auth("Bearer " + token)
-                .execute().body();
-
-        JSONObject jsonObject = JSONUtil.parseObj(res);
-        JSONArray jsonArray = JSONUtil.parseArray(jsonObject.get("items"));
-        System.out.println(jsonObject);
-        Video video = JSONUtil.toBean(JSONUtil.toJsonStr(jsonArray.get(1)), Video.class);
-        System.out.println(video.getSnippet());
-
         return res;
     }
 

@@ -1,4 +1,4 @@
-package com.youtube_demo.oauth;
+package com.youtube_demo.util.oauth;
 import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 public class Oauth {
 
     private static final String client_id = "656863191434-f0ab0j31jrjtas919i2jrt1ejj1bcgum.apps.googleusercontent.com";
-    private static final String client_secret = "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";
+    private static final String client_secret = "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";
 
     //workspace 这个号
     /*private static final String client_id = "508785976421-cr17tf61kj47jdaefigaas2vsnqi9emd.apps.googleusercontent.com";
@@ -56,6 +56,7 @@ public class Oauth {
         Token token = JSON.parseObject(res, Token.class);
         System.out.println(token.getAccess_token());
         tokenString = token.getAccess_token();
+        System.out.println("tttt" + tokenString);
         /*HttpSession session = request.getSession();
         session.setAttribute("token", token.getAccess_token());*/
         /*System.out.println(token.getAccess_token() + "\n" + session.getAttribute("token"));*/

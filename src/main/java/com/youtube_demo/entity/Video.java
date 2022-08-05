@@ -2,7 +2,7 @@ package com.youtube_demo.entity;
 
 import lombok.Data;
 
-import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @author wyk
@@ -12,12 +12,19 @@ import java.util.Map;
 @Data
 public class Video {
     private String kind;
+
     private String etag;
+
     private String id;
+
+    private String pageInfo;
+
     //视频的基本信息
-    private Map<String, String> snippet;
+    private HashMap<String, Object> snippet;
+
     //视频的统计信息
-    private Map<String, String> statistics;
+    private HashMap<String, Object> statistics;
+
     //直播信息
-    private Map<String, String> liveStreamingDetails;
+    private HashMap<String, Object> liveStreamingDetails;
 }
