@@ -11,6 +11,7 @@ import lombok.Data;
 public class Token {
     private String access_token;
     private String expires_in;   //过期时间
+    private String refresh_token;
     private String scope;
     private String token_type;
 }

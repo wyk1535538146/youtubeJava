@@ -2,6 +2,8 @@ package com.youtube_demo.controller;
 
 
 import com.youtube_demo.service.SearchService;
+import com.youtube_demo.util.commonMethod.JsonHandling;
+import com.youtube_demo.util.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +20,6 @@ public class SearchController {
     @Autowired
     SearchService searchService;
 
-    //todo test一下
     /**
      * @description: 根据键入的查找内容查找对应的youtube信息，并返回
      * @author: wyk
@@ -27,14 +28,11 @@ public class SearchController {
      * @return: Json
      **/
     @RequestMapping("search")
-    public String search(HttpServletRequest request){
+    public Result<Object> search(HttpServletRequest request){
         String inputText = request.getParameter("inputText");
-
         System.out.println(inputText);
         String searchListStr = searchService.getSearchList(inputText, "video", 50, "");
 
-        System.out.println(searchListStr);
-        return searchListStr;
-//        return JsonHandling.handleResponseOfService(searchListStr);
+        return JsonHandling.handleResponseOfService(searchListStr);
     }
 }

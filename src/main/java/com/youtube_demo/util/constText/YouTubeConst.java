@@ -11,8 +11,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum YouTubeConst {
-    /**操作成功**/
+    /** base_url **/
     BASE_URL("https://www.googleapis.com/youtube/v3"),
+
+    BASE_URL_MOCK(""),
 
 //    /**workspace_key**/
 //    KEY("AIzaSyDkAu2Vi-My8rxmvfVvXkt9Zuj7zuqAq2E"),

@@ -19,7 +19,7 @@ public class JsonHandling {
             JSONObject errorJson = JSONUtil.parseObj(jsonObject.get("error"));
             return Result.fail((Integer) errorJson.get("code"), (String) errorJson.get("message"));
         } else {
-            return Result.success(jsonStr);
+            return Result.success(jsonObject);
         }
     }
 

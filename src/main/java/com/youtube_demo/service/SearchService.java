@@ -15,10 +15,17 @@ import java.util.HashMap;
  */
 @Service
 public class SearchService {
-    String token = Oauth.tokenString;
 
 
+    /**
+     * @description: 根据相关内容，如查找关键字q，类型，最大返回数量等通过youtubeAPI获取查找结果
+     * @author: wyk
+     * @date: 2022/8/5 16:59
+     * @param: [q, type, maxResults, eventType]
+     * @return: java.lang.String
+     **/
     public String getSearchList(String q, String type, int maxResults, String eventType){
+        System.out.println(Oauth.tokenString);
         // TODO 这部分参数感觉可以优化
         HashMap<String, Object> param = new HashMap<>();
         param.put("key", YouTubeConst.KEY.getText());
@@ -31,18 +38,8 @@ public class SearchService {
 
         String url = YouTubeConst.BASE_URL.getText() + "/search";
 
-        String proxy = "127.0.0.1";  //代理ip
-        int port = 4780;   //代理的端口，
-        System.setProperty("proxyType", "4");
-        System.setProperty("proxyPort", Integer.toString(port));
-        System.setProperty("proxyHost", proxy);
-        System.setProperty("proxySet", "true");
-
         System.out.println(url + "\n" + param.get("key"));
 
-        /*String res = HttpUtil.get(url,param);
-
-        return res;*/
         return HttpRequest.get(url)
                 .setHttpProxy("127.0.0.1", 4780)
                 .form(param)

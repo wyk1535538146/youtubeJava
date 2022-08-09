@@ -1,6 +1,8 @@
 package com.youtube_demo.controller;
 
 import com.youtube_demo.service.LiveChatService;
+import com.youtube_demo.util.commonMethod.JsonHandling;
+import com.youtube_demo.util.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,14 +27,13 @@ public class LiveChatController {
      * @return: com.youtube_demo.util.result.Result<java.lang.Object>
      **/
     @RequestMapping("LiveChatMessages_insert")
-    public String LiveChatMessages_insert(HttpServletRequest request) {
+    public Result<Object> LiveChatMessages_insert(HttpServletRequest request) {
         String id = request.getParameter("videoId");
         String messageText = request.getParameter("messageText");
 
         String res = liveChatService.liveChatMessage_insert(id, messageText);
 
         System.out.println(res);
-        return res;
-//        return JsonHandling.handleResponseOfService(res);
+        return JsonHandling.handleResponseOfService(res);
     }
 }
