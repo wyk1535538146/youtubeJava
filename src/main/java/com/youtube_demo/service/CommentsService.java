@@ -25,7 +25,7 @@ public class CommentsService {
      **/
     public String comments_insert(String parentId, String textOriginal){
         //todo json格式
-        String body = "{'snippet':{'parentId':'" + parentId + "','textOriginal':'" + textOriginal + "'}}";
+        String body = "{\"snippet\":{\"parentId\":\"" + parentId + "\",\"textOriginal\":\"" + textOriginal + "\"}}";
 
         String url = YouTubeConst.BASE_URL.getText() + "/comments?part=snippet&key=" + YouTubeConst.KEY.getText();
 

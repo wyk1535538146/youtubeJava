@@ -36,7 +36,7 @@ public class ChannelsService {
         param.put("key", YouTubeConst.KEY.getText());
         param.put("part", "brandingSettings");
 
-        String body = "{'id':'" + id + "','brandingSettings':{'channel': {'description': '" + description + "', 'defaultLanguage': 'en'}}}";
+        String body = "{\"id\":\"" + id + "\",\"brandingSettings\":{\"channel\": {\"description\": \"" + description + "\", \"defaultLanguage\": \"en\"}}}";
         String url = YouTubeConst.BASE_URL.getText() + "/channels";
 
         System.out.println(body);

@@ -14,6 +14,10 @@ public enum YouTubeConst {
     /** base_url **/
     BASE_URL("https://www.googleapis.com/youtube/v3"),
 
+    /** 测试 **/
+//    BASE_URL("http://192.168.2.140:7001"),
+
+
     BASE_URL_MOCK(""),
 
 //    /**workspace_key**/

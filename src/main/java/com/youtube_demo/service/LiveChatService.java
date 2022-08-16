@@ -49,7 +49,8 @@ public class LiveChatService {
         String snippetStr = "{" + snippet + "}";
 
 
-        snippetStr = "{'snippet':{'liveChatId':'" + liveChatId + "','type':'textMessageEvent','textMessageDetails':{'messageText':'" + messageText + "'}}}";
+        //todo 转义
+        snippetStr = "{\"snippet\":{\"liveChatId\":\"" + liveChatId + "\",\"type\":\"textMessageEvent\",\"textMessageDetails\":{\"messageText\":\"" + messageText + "\"}}}";
 
         System.out.println(snippet);
         System.out.println(url);

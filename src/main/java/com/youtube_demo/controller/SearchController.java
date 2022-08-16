@@ -31,6 +31,7 @@ public class SearchController {
     public Result<Object> search(HttpServletRequest request){
         String inputText = request.getParameter("inputText");
         System.out.println(inputText);
+
         String searchListStr = searchService.getSearchList(inputText, "video", 50, "");
 
         return JsonHandling.handleResponseOfService(searchListStr);

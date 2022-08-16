@@ -23,17 +23,18 @@ public class CommentThreadsController {
     CommentThreadsService commentThreadsService;
 
     /**
-     * @description:
+     * @description: 获取视频的顶级评论
      * @author: wyk
      * @date: 2022/8/3 8:46
      * @param: [request]
      * @return: java.lang.String
      **/
-    @RequestMapping("show")
+    @RequestMapping("api_show")
     public String show(HttpServletRequest request){
         String videoId = request.getParameter("videoId");
 
         String commentThreadsList = commentThreadsService.getCommentThreadsList(videoId, 50);
+        System.out.println(commentThreadsList);
         //todo res处理
         return commentThreadsList;
     }

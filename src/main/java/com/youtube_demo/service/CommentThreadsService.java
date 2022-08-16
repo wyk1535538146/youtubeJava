@@ -16,6 +16,13 @@ import java.util.HashMap;
 @Service
 public class CommentThreadsService {
 
+    /**
+     * @description: 获取该视频的顶级评论
+     * @author: wyk
+     * @date: 2022/8/12 12:21
+     * @param: [videoId, maxResults]
+     * @return: java.lang.String
+     **/
     public String getCommentThreadsList(String videoId, int maxResults){
         HashMap<String, Object> param = new HashMap<>();
         param.put("key", YouTubeConst.KEY.getText());
@@ -25,6 +32,7 @@ public class CommentThreadsService {
         param.put("order","relevance");
 
         String url = YouTubeConst.BASE_URL.getText() + "/commentThreads";
+        System.out.println(url);
 //        String res = HttpUtil.get(url,param);
         return HttpRequest.get(url)
                 .setHttpProxy("127.0.0.1", 4780)
@@ -33,8 +41,15 @@ public class CommentThreadsService {
     }
 
 
+    /**
+     * @description: commentThreads:insert 评论视频（插入顶级评论）
+     * @author: wyk
+     * @date: 2022/8/12 12:20
+     * @param: [videoId, textOriginal]
+     * @return: java.lang.String
+     **/
     public String commentThreads_insert(String videoId, String textOriginal){
-        String snippetString = "{'snippet':{'videoId':'" + videoId + "','topLevelComment':{'snippet':{'textOriginal':'" + textOriginal + "'}}}}";
+        String snippetString = "{\"snippet\":{\"videoId\":\"" + videoId + "\",\"topLevelComment\":{\"snippet\":{\"textOriginal\":\"" + textOriginal + "\"}}}}";
         String url = YouTubeConst.BASE_URL.getText() + "/commentThreads?part=snippet&key=" + YouTubeConst.KEY.getText();
         String token = Oauth.tokenString;
 

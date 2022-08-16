@@ -40,8 +40,10 @@ public class SearchService {
 
         System.out.println(url + "\n" + param.get("key"));
 
+
         return HttpRequest.get(url)
                 .setHttpProxy("127.0.0.1", 4780)
+                .header("Accept", "application/json")
                 .form(param)
                 .execute().body();
     }
