@@ -1,16 +1,18 @@
 package com.youtube_demo.controller;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.youtube_demo.service.CommentThreadsService;
-import com.youtube_demo.util.constText.YouTubeConst;
-import com.youtube_demo.util.oauth.Oauth;
+import com.youtube_demo.util.commonMethod.JsonHandling;
+import com.youtube_demo.util.result.Result;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 
 /**
  * @author wyk
@@ -21,6 +23,8 @@ import java.util.HashMap;
 public class CommentThreadsController {
     @Autowired
     CommentThreadsService commentThreadsService;
+
+    private static final Logger logger = Logger.getLogger(CommentThreadsController.class);
 
     /**
      * @description: 获取视频的顶级评论
@@ -41,19 +45,24 @@ public class CommentThreadsController {
 
 
     /**
-     * @description:  在视频中创建顶级评论
+     * @description: 在视频中创建顶级评论
      * @author: wyk
      * @date: 2022/8/3 17:53
      * @param: [request]
      * @return: java.lang.String
      **/
-    @RequestMapping("commentThreads_insert")
-    public String commentThreads_insert(HttpServletRequest request){
-        String textOriginal = request.getParameter("commentText");
-        String videoId = request.getParameter("videoId");
+    @PostMapping("commentThreads_insert")
+    public Result<Object> commentThreads_insert(@RequestBody String params){
+        JSONObject jsonObject = JSONUtil.parseObj(params);
+        String textOriginal = (String) jsonObject.get("commentText");
+        String videoId = (String) jsonObject.get("videoId");
+        String key = (String) jsonObject.get("key");
+        String token = (String) jsonObject.get("access_token");
 
-        String res = commentThreadsService.commentThreads_insert(videoId, textOriginal);
-        //todo res处理
-        return res;
+        String res = commentThreadsService.commentThreads_insert(videoId, textOriginal, key, token);
+
+        logger.debug("commentThreads_insert res => " + res);
+
+        return JsonHandling.handleResponseOfService(res);
     }
 }

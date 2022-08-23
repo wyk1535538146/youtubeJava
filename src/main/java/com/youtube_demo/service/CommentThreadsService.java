@@ -48,10 +48,9 @@ public class CommentThreadsService {
      * @param: [videoId, textOriginal]
      * @return: java.lang.String
      **/
-    public String commentThreads_insert(String videoId, String textOriginal){
+    public String commentThreads_insert(String videoId, String textOriginal, String key, String token){
         String snippetString = "{\"snippet\":{\"videoId\":\"" + videoId + "\",\"topLevelComment\":{\"snippet\":{\"textOriginal\":\"" + textOriginal + "\"}}}}";
-        String url = YouTubeConst.BASE_URL.getText() + "/commentThreads?part=snippet&key=" + YouTubeConst.KEY.getText();
-        String token = Oauth.tokenString;
+        String url = YouTubeConst.BASE_URL.getText() + "/commentThreads?part=snippet&key=" + key;
 
         return HttpRequest.post(url)
                 .setHttpProxy("127.0.0.1", 4780)
