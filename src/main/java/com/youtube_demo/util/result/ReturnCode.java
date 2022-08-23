@@ -16,6 +16,8 @@ public enum ReturnCode {
     SUCCESS(200,"OK"),
     /**操作失败**/
     FORBIDDEN(403,"没有权限！"),
+    /**配额超出**/
+    QUOTAEXCEEDED(403, "quotaExceeded"),  //todo 配额
     /**未找到**/
     NOT_FOUND(404,"不存在相关内容！"),
     /**错误的请求**/

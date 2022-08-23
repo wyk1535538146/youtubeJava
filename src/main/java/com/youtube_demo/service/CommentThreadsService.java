@@ -7,6 +7,7 @@ import com.youtube_demo.util.oauth.Oauth;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * @author wyk
@@ -23,21 +24,27 @@ public class CommentThreadsService {
      * @param: [videoId, maxResults]
      * @return: java.lang.String
      **/
-    public String getCommentThreadsList(String videoId, int maxResults){
+    public String getCommentThreadsList(String videoId, int maxResults, String pageToken, String key, String commentKey){
         HashMap<String, Object> param = new HashMap<>();
-        param.put("key", YouTubeConst.KEY.getText());
+        param.put("key", key);
         param.put("part", "snippet");
         param.put("videoId", videoId);
         param.put("maxResults", maxResults);
         param.put("order","relevance");
+        if(!pageToken.equals("")) param.put("pageToken", pageToken);
+
 
         String url = YouTubeConst.BASE_URL.getText() + "/commentThreads";
         System.out.println(url);
-//        String res = HttpUtil.get(url,param);
-        return HttpRequest.get(url)
+        String res = HttpRequest.get(url)
                 .setHttpProxy("127.0.0.1", 4780)
                 .form(param)
                 .execute().body();
+
+        if(!commentKey.equals("")){
+            //todo 过滤
+        }
+        return res;
     }
 
 

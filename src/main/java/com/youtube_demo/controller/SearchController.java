@@ -1,5 +1,7 @@
 package com.youtube_demo.controller;
 
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -23,29 +25,45 @@ import java.util.HashMap;
  * @description 搜索相关实现
  */
 @RestController
+@Log4j
 public class SearchController {
     @Autowired
     SearchService searchService;
 
-    private static final Logger logger = Logger.getLogger(SearchController.class);
-
     /**
-     * @description: 根据键入的查找内容查找对应的youtube信息，并返回
+     * @description: 根据键入的查找内容查找对应的youtube信息，并返回(默认返回maxresult=50)
      * @author: wyk
      * @date: 2022/8/1 17:50
      * @param: [request]
      * @return: Json
      **/
-    @RequestMapping("search")
-    public Result<Object> search(HttpServletRequest request){
-        String inputText = request.getParameter("inputText");
-        System.out.println(inputText);
+    @PostMapping("search")
+    public Result<HashMap<String, Object>> search(@RequestBody String params){
+        JSONObject jsonObject = JSONUtil.parseObj(params);
+        String q = (String) jsonObject.get("inputText");
+        String key = (String) jsonObject.get("key");
+        String pageToken = (String) jsonObject.get("nextPageToken");
 
-        String searchListStr = searchService.getSearchList(inputText, "video", 50, "");
+        ArrayList<HashMap<String, String>> resList = new ArrayList<HashMap<String, String>>();
+        HashMap<String, Object> res = new HashMap<>();
 
-        return JsonHandling.handleResponseOfService(searchListStr);
+        String searchListStr = searchService.getSearchList(q, "video", 50, "", key, pageToken);
+        JSONObject resJson = JSONUtil.parseObj(searchListStr);
+        pageToken = (String) resJson.get("nextPageToken");
+        getIdAndText(searchListStr, resList);
+        res.put("nextPageToken", pageToken);
+        res.put("items", resList);
+
+        return Result.success(res);
     }
 
+    /**
+     * @description: 根据视频数量获取
+     * @author: wyk
+     * @date: 2022/8/23 10:23
+     * @param: [params]
+     * @return: com.youtube_demo.util.result.Result<java.util.ArrayList<java.util.HashMap<java.lang.String,java.lang.String>>>
+     **/
     @PostMapping("getVideoIds")
     public Result<ArrayList<HashMap<String, String>>> getVideoIds(@RequestBody String params){
         JSONObject jsonObject = JSONUtil.parseObj(params);
@@ -56,60 +74,47 @@ public class SearchController {
 
         //分页查询
         String nextPageToken = "";
-        String prevPageToken = "";
 
         ArrayList<HashMap<String, String>> resList = new ArrayList<HashMap<String, String>>();
 
         String res = "";
         if(videoCount < 50){
-            res = searchService.getSearchList(q, "video", videoCount, "", key, "", "");
-            JSONObject resJson = JSONUtil.parseObj(res);
-            JSONArray resJsonArray = JSONUtil.parseArray(resJson.get("items"));
-            for (Object o : resJsonArray) {
-                //每个视频详细信息
-                JSONObject jsonObject1 = (JSONObject) o;
-                HashMap<String, String> map = new HashMap<>();
-                map.put("id", (String) JSONUtil.parseObj(jsonObject1.get("id")).get("videoId"));
-                map.put("text", (String) JSONUtil.parseObj(jsonObject1.get("snippet")).get("title"));
-                resList.add(map);
-            }
+            res = searchService.getSearchList(q, "video", videoCount, "", key, "");
+            getIdAndText(res, resList);
         }
         else {
             int n = videoCount;
             do {
                 if(n > 50){
-                    res = searchService.getSearchList(q, "video", 50, "", key, nextPageToken, "");
+                    res = searchService.getSearchList(q, "video", 50, "", key, nextPageToken);
                     n = n - 50;
                     JSONObject resJson = JSONUtil.parseObj(res);
                     nextPageToken = (String) resJson.get("nextPageToken");
                     System.out.println("nextPageToken => " + nextPageToken);
-                    JSONArray resJsonArray = JSONUtil.parseArray(resJson.get("items"));
-                    for (Object o : resJsonArray) {
-                        //每个视频详细信息
-                        JSONObject jsonObject1 = (JSONObject) o;
-                        HashMap<String, String> map = new HashMap<>();
-                        map.put("id", (String) JSONUtil.parseObj(jsonObject1.get("id")).get("videoId"));
-                        map.put("text", (String) JSONUtil.parseObj(jsonObject1.get("snippet")).get("title"));
-                        resList.add(map);
-                    }
+                    getIdAndText(res, resList);
                 }else {
-                    res = searchService.getSearchList(q, "video", n, "", key, nextPageToken, "");
+                    res = searchService.getSearchList(q, "video", n, "", key, nextPageToken);
                     n = 0;
-                    JSONObject resJson = JSONUtil.parseObj(res);
-                    JSONArray resJsonArray = JSONUtil.parseArray(resJson.get("items"));
-                    for (Object o : resJsonArray) {
-                        //每个视频详细信息
-                        JSONObject jsonObject1 = (JSONObject) o;
-                        HashMap<String, String> map = new HashMap<>();
-                        map.put("id", (String) JSONUtil.parseObj(jsonObject1.get("id")).get("videoId"));
-                        map.put("text", (String) JSONUtil.parseObj(jsonObject1.get("snippet")).get("title"));
-                        resList.add(map);
-                    }
+                    getIdAndText(res, resList);
                 }
             } while (n > 0);
         }
-        logger.debug("返回列表信息 => " + resList);
+        log.debug("返回列表信息 => " + resList);
         return Result.success(resList);
+    }
+
+
+    public void getIdAndText(String res, ArrayList<HashMap<String, String>> resList){
+        JSONObject resJson = JSONUtil.parseObj(res);
+        JSONArray resJsonArray = JSONUtil.parseArray(resJson.get("items"));
+        for (Object o : resJsonArray) {
+            //每个视频详细信息
+            JSONObject jsonObject1 = (JSONObject) o;
+            HashMap<String, String> map = new HashMap<>();
+            map.put("id", (String) JSONUtil.parseObj(jsonObject1.get("id")).get("videoId"));
+            map.put("text", (String) JSONUtil.parseObj(jsonObject1.get("snippet")).get("title"));
+            resList.add(map);
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.youtube_demo.util.constText.YouTubeConst;
 import com.youtube_demo.util.oauth.Oauth;
+import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.HashMap;
  * @description YouTube Data API comments内容接口service
  */
 @Service
+@Log4j
 public class CommentsService {
 
     /**
@@ -23,15 +25,12 @@ public class CommentsService {
      * @param: [parentId, textOriginal]
      * @return: java.lang.String
      **/
-    public String comments_insert(String parentId, String textOriginal){
+    public String comments_insert(String parentId, String textOriginal, String key, String token){
         //todo json格式
         String body = "{\"snippet\":{\"parentId\":\"" + parentId + "\",\"textOriginal\":\"" + textOriginal + "\"}}";
 
-        String url = YouTubeConst.BASE_URL.getText() + "/comments?part=snippet&key=" + YouTubeConst.KEY.getText();
-
-        System.out.println(body);
-        String token = Oauth.tokenString;
-        System.out.println("token" + token);
+        String url = YouTubeConst.BASE_URL.getText() + "/comments?part=snippet&key=" + key;
+        log.debug("requestBody => " + body);
         return HttpRequest.post(url)
                 .setHttpProxy("127.0.0.1", 4780)
                 .auth("Bearer " + token)

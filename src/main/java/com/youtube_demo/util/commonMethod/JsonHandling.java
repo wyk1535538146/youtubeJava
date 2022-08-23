@@ -12,6 +12,13 @@ import com.youtube_demo.util.result.Result;
  */
 public class JsonHandling {
 
+    /**
+     * @description: 处理YouTube官方返回结果
+     * @author: wyk
+     * @date: 2022/8/23 10:15
+     * @param: [jsonStr]
+     * @return: com.youtube_demo.util.result.Result<java.lang.Object>
+     **/
     public static <T> Result<Object> handleResponseOfService(String jsonStr){
         JSONObject jsonObject = JSONUtil.parseObj(jsonStr);
         if (jsonObject.get("error") != null) {
